@@ -1,8 +1,240 @@
+# ===== SQL =====
 snippet sql_add_column "Dodanie kolumny do tabeli."
 -- Jeżeli dodajesz do xlog to przesuń kolumnę id na koniec tabeli
 ALTER TABLE tabela_w_bazie
 ADD COLUMN kolumna_w_bazie typ_danych;
 endsnippet
-snippet sql_wsad "dodanie"
+snippet sql_add_foreign_key "Dodanie klucza obcego do tabeli."
+ALTER TABLE tabela ADD COLUMN idkolumna INT REFERENCES tabela2(id);
+endsnippet
+snippet sql_changetype "Zmiana typu kolumny w tabeli."
+ALTER TABLE tabela_w_bazie
+ALTER COLUMN tabela_w_bazie TYPE nowy_typ_danych;
+endsnippet
+snippet sql_default "Change or remove default value from column."
+ALTER TABLE tabela_w_bazie ALTER COLUMN kolumna_w_tabeli [SET DEFAULT wartosc_domyslna | DROP DEFAULT];
+endsnippet
+snippet sql_dropcolumn "Usunięcie kolumny w tabeli."
+ALTER TABLE tabela_w_bazie
+DROP COLUMN kolumna_w_bazie;
+endsnippet
+snippet sql_FDMcreatetable "Tworznie tabeli pod FDM z 1 relacją (pacj)."
+CREATE TABLE fdm_zasw_kwalifikacja_do_szczepienia (
+    id SERIAL PRIMARY KEY,
+    wysw BOOLEAN DEFAULT true,
+    del BOOLEAN DEFAULT false,
+    dodata TIMESTAMP WITHOUT TIME ZONE,
+    didoper INTEGER,
+    modata TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
+    midoper INTEGER,
+    licznik INTEGER DEFAULT 0,
+    opis TEXT,
+    komentarz CHARACTER VARYING(100),
+    idpacj INTEGER,
+    data_badania DATE,
+    pozwolenie TEXT,
+    uwagi_zalecenia TEXT,
+    skier_na_kons_adres TEXT,
+    data_wyst DATE DEFAULT now(),
+    nr_dok_tozsamosci TEXT,
+    godzina TEXT,
+    miejscowosc TEXT,
+    szczepienie_przeciw TEXT,
+
+    FOREIGN KEY (didoper) REFERENCES public.oper (id),
+    FOREIGN KEY (idpacj) REFERENCES public.pacj (id),
+    FOREIGN KEY (midoper) REFERENCES public.oper (id)
+);
+
+INSERT INTO fdm (dodata, didoper, modata, midoper, opis, kod, kod2, nazw, kategoria, rum)
+VALUES ('now()', 0,
+endsnippet
+snippet sql_insertinto "Dodanie czegoś do tabeli."
+INSERT INTO tabela_w_bazie (dodata, didoper, modata, midoper, opis, add1, add2, add3, add4)
+VALUES ('now()', 0, 'now()', 0, opis, add1, add2, add3, add4);
+endsnippet
+snippet sql_update "Change value of specific fields."
+UPDATE tabela_w_bazie
+SET kolumna = wartosc, kolumna = wartosc
+WHERE warunek;
+endsnippet
+snippet sql_xlogid "Przesunięcie kolumny idxlog na koniec tabeli aby doctrine działało."
+ALTER TABLE xlog_pacj
+DROP COLUMN idxlog;
+
+ALTER TABLE xlog_pacj
+ADD COLUMN idxlog SERIAL PRIMARY KEY;
 endsnippet
 
+
+# ===== TWIG =====
+snippet twig_druk_linia_i_etykieta "Pojedyńcza linia z etykietą w nawiasie pod spodem."
+<div style="padding-bottom: 10px;"><b>4.</b> Przedstawiciel ustawowy, jeżeli dotyczy: </div>
+{{ pdf_label(dane.przedstawicielUstawowy|nl2br) }} {{ pdf_label_sub('', '(imię, nazwisko, adres)') }}
+endsnippet
+snippet twig_linienawydruku_A4 "4 ładnie sformatoane linie na wydryku A4"
+{% set lines %}
+    <div style="padding-bottom: 10px; padding-top: 15px;">{{ pdf_label_sub('&#160;') }}</div>
+    <div style="padding-bottom: 10px;">{{ pdf_label_sub('&#160;') }}</div>
+    <div style="padding-bottom: 10px;">{{ pdf_label_sub('&#160;') }}</div>
+    <div style="padding-bottom: 15px;">{{ pdf_label_sub('&#160;') }}</div>
+{% endset %}
+
+<div style="padding-bottom: 15px;"><b>5.</b> Rozpoznanie: </div>
+{{ dane.rozpoznanie ? dane.rozpoznanie|nl2br : lines }}
+endsnippet
+snippet twig_podkreslenianawydruku "Podkreślanie wybranej opcji na wydruku."
+{% set opcja = dane.zgoda %}
+<div style="padding-bottom: 5px; {{ opcja ? checked }}">  
+    - za zgodą / bez zgody*,
+</div>
+endsnippet
+
+
+# ===== ORM =====
+snippet orm_manyToMany "Przykład powiązania many to many."
+manyToMany:
+    nfzIcfOcenaHospWypis: (nazwa właściwości encji)
+        targetEntity: SMS\Domain\Nfz\Zlec\Zlec (endja w którą celujemy)
+        joinTable:
+            name: zlec_icf_kod_ocena (tabela łącząca)
+            joinColumns:
+                idnfz_icf_ocena_hosp_wypis: (kolumna z id aktualnej tabeli)
+                    referencedColumnName: id
+            inverseJoinColumns:
+                idzlec: (kolumna z id tabeli w którą celujemy)
+                    referencedColumnName: id
+        cascade: [persist]
+endsnippet
+snippet orm_manyToOne "Przykład powiązania many to one."
+manyToOne:
+  tag:
+    targetEntity: SMS\Bundle\Pliki\Domain\Plik\Tag
+    joinColumn: { name: idtag }
+    inversedBy: plikTag
+endsnippet
+snippet orm_oneToMany "Przykład powiązania one to many."
+oneToMany:
+  plikTag:
+    targetEntity: SMS\Bundle\Pliki\Domain\Plik\PlikTag
+    mappedBy: tag
+endsnippet
+
+
+# ===== XML WRITER =====
+snippet xml_writer_attribute "Dodanie atrybutu do aktualnie otwartego elementu."
+$xml->writeAttribute("", null);
+endsnippet
+snippet xml_writer_attribute_ns "Dodanie atrybutu z namespacem do aktualnie otwartego elementu."
+$xml->writeAttributeNs('', '', null, 'uri');
+endsnippet
+snippet xml_writer_block "Bloczek z atrybutami biblioteki xml_writer."
+$xml->startElement("");
+    $xml->writeAttribute("", null);
+    $xml->writeAttribute("", null);
+$xml->endElement(); // koniec ""
+endsnippet
+snippet xml_writer_block_ns "Dodanie bloczku z namespacami."
+$xml->startElementNs('', '', null);
+    $xml->writeAttributeNs('', '', null, 'uri');
+    $xml->writeAttributeNs('', '', null, 'uri');
+$xml->endElement();
+endsnippet
+
+
+# ===== SYMFONY =====
+snippet symf_cookies "Dodanie zapamiętywania wybranych danych formularza w cookies."
+// kod poniżej wstawć na samym początku metody
+$cookie         = new SmsCookie();
+$formData       = [];
+
+if ($cookie->has('pacj_archiwum')) {
+    $formData = unserialize($cookie->get('pacj_archiwum'));
+
+    $poradnia = $this->poradniaManager->getPoradniaById($formData['poradnia']);
+    $formData['poradnia'] = $poradnia;
+}
+
+$form = $this->createForm('pacj_archiwum', $pacjDoArchiwum, [
+    'data' => $formData,
+]);
+
+// kod poniżej wstawić do $form->isSubmitted / $form->isValid
+$data = $form->getData();
+$formCookieData = [];
+/** @var Poradnia $poradnia */
+$poradnia = $data['poradnia'];
+
+$formCookieData['poradnia'] = $poradnia->getId();
+$formCookieData['dokPoradniaOd'] = $data['dokPoradniaOd'];
+$formCookieData['dokPoradniaDo'] = $data['dokPoradniaDo'];
+
+$cookie->set('pacj_archiwum', serialize($formCookieData));
+endsnippet
+snippet symf_wyslij_mail "Wysyłanie maili z poziomu controllera."
+$body  = 'id:'.$kodKsiegowy->getId().'<br>';
+$body .= 'przedKod:'.$kodPrzed.'<br>';
+$body .= 'poKod:'.$kodKsiegowy->getKod().'<br>';
+$body .= 'przedMoper:'.$moperPrzed.'<br>';
+$body .= 'poMoper:'.$kodKsiegowy->getMoper().'<br>';
+$body .= 'przedModata:'.$modataPrzed.'<br>';
+$body .= 'poModata:'.$kodKsiegowy->getModata()->format('Y-m-d H:i:s').'<br>';
+$message = \Swift_Message::newInstance()
+    ->setSubject('mapowanie_kont_ksiegowych_log')
+    ->setFrom('SMS@blue-note.pl')
+    ->setTo('pkochany@blue-note.pl')
+    ->setBody(
+	$body,
+	'text/html'
+    );
+$this->getContainer()->get('mailer')->send($message);
+endsnippet
+snippet symf_select2 "Prepare data for Select2 response in Controller."
+$lokalizacje = $this->lokalizacjaRepository->getLokalizacje();
+$gotowaLokArray = [];
+
+// przygotowanie odpowiedzi pod select2
+foreach ($lokalizacje as $arr) {
+    $arr['text'] = $arr['nazwa'];
+    array_push($gotowaLokArray, $arr);
+}
+
+return new JsonResponse($gotowaLokArray);
+endsnippet
+
+
+# ===== JQUERY =====
+snippet jq_document_ready "jQuery document ready function"
+$(document).ready(function() {
+
+});
+endsnippet
+snippet jq_ajax_call "jQuery Ajax call function"
+$('.edytuj').click(function(e){
+    e.preventDefault();
+
+    var $lp = $(this).attr('id');
+
+    var $kod = $('#kod-' + $lp).text();
+    var $kodid = $('#kodid-' + $lp).text();
+    var $idlokalizacja = $('#lokalizacja-' + $lp).text();
+    var $idmp_poradnia = $('#poradnia-' + $lp).text();
+    var $modal = $('#edytuj-modal');
+
+    $.ajax({
+        url: Routing.generate('faktura.optima.mapowanie.edytuj'),
+        method: "POST",
+        data: {
+            kod: $kod,
+            kodid: $kodid,
+            idlokalizacja: $idlokalizacja,
+            idmp_poradnia: $idmp_poradnia
+        },
+        success: function (html) {
+            $modal.html(html);
+            $('.modal-content').css('maxWidth', 1000).addClass('col-sm-6').css({'top': '10%'}).css({'left': '25%'});
+            $modal.modal();
+        }
+    });
+});
+endsnippet
