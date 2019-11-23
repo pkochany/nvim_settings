@@ -1,25 +1,25 @@
 # ===== SQL =====
-snippet sql_add_column "Dodanie kolumny do tabeli."
--- Jeżeli dodajesz do xlog to przesuń kolumnę id na koniec tabeli
-ALTER TABLE tabela_w_bazie
-ADD COLUMN kolumna_w_bazie typ_danych;
+snippet sql_add_column "Add column to table."
+-- If you add to xlogged table remember to reset id in xlog table.
+ALTER TABLE table
+ADD COLUMN column data_type;
 endsnippet
-snippet sql_add_foreign_key "Dodanie klucza obcego do tabeli."
-ALTER TABLE tabela ADD COLUMN idkolumna INT REFERENCES tabela2(id);
+snippet sql_add_foreign_key "Add foreign key to database table."
+ALTER TABLE table ADD COLUMN idcolumn INT REFERENCES table2(id);
 endsnippet
-snippet sql_changetype "Zmiana typu kolumny w tabeli."
-ALTER TABLE tabela_w_bazie
-ALTER COLUMN tabela_w_bazie TYPE nowy_typ_danych;
+snippet sql_changetype "Change column type in a table."
+ALTER TABLE table
+ALTER COLUMN column TYPE data_type;
 endsnippet
 snippet sql_default "Change or remove default value from column."
-ALTER TABLE tabela_w_bazie ALTER COLUMN kolumna_w_tabeli [SET DEFAULT wartosc_domyslna | DROP DEFAULT];
+ALTER TABLE table ALTER COLUMN column [SET DEFAULT default_value | DROP DEFAULT];
 endsnippet
-snippet sql_dropcolumn "Usunięcie kolumny w tabeli."
-ALTER TABLE tabela_w_bazie
-DROP COLUMN kolumna_w_bazie;
+snippet sql_dropcolumn "Drop column from table."
+ALTER TABLE table
+DROP COLUMN column;
 endsnippet
-snippet sql_FDMcreatetable "Tworznie tabeli pod FDM z 1 relacją (pacj)."
-CREATE TABLE fdm_zasw_kwalifikacja_do_szczepienia (
+snippet sql_FDMcreatetable "Creating table for FDM with 1 relation (pacj)."
+CREATE TABLE table (
     id SERIAL PRIMARY KEY,
     wysw BOOLEAN DEFAULT true,
     del BOOLEAN DEFAULT false,
@@ -49,16 +49,16 @@ CREATE TABLE fdm_zasw_kwalifikacja_do_szczepienia (
 INSERT INTO fdm (dodata, didoper, modata, midoper, opis, kod, kod2, nazw, kategoria, rum)
 VALUES ('now()', 0,
 endsnippet
-snippet sql_insertinto "Dodanie czegoś do tabeli."
-INSERT INTO tabela_w_bazie (dodata, didoper, modata, midoper, opis, add1, add2, add3, add4)
+snippet sql_insertinto "Insert into."
+INSERT INTO table (dodata, didoper, modata, midoper, opis, add1, add2, add3, add4)
 VALUES ('now()', 0, 'now()', 0, opis, add1, add2, add3, add4);
 endsnippet
-snippet sql_update "Change value of specific fields."
-UPDATE tabela_w_bazie
-SET kolumna = wartosc, kolumna = wartosc
-WHERE warunek;
+snippet sql_update "Update."
+UPDATE table
+SET column = value, column2 = value2
+WHERE condition;
 endsnippet
-snippet sql_xlogid "Przesunięcie kolumny idxlog na koniec tabeli aby doctrine działało."
+snippet sql_xlogid "Move idxlog column to the end of a table."
 ALTER TABLE xlog_pacj
 DROP COLUMN idxlog;
 
@@ -68,11 +68,11 @@ endsnippet
 
 
 # ===== TWIG =====
-snippet twig_druk_linia_i_etykieta "Pojedyńcza linia z etykietą w nawiasie pod spodem."
+snippet twig_print_line_and_label "Single dotted line with braced label under it."
 <div style="padding-bottom: 10px;"><b>4.</b> Przedstawiciel ustawowy, jeżeli dotyczy: </div>
 {{ pdf_label(dane.przedstawicielUstawowy|nl2br) }} {{ pdf_label_sub('', '(imię, nazwisko, adres)') }}
 endsnippet
-snippet twig_linienawydruku_A4 "4 ładnie sformatoane linie na wydryku A4"
+snippet twig_multiple_lines_A4 "4 pretty formatted lines for A4 paper size."
 {% set lines %}
     <div style="padding-bottom: 10px; padding-top: 15px;">{{ pdf_label_sub('&#160;') }}</div>
     <div style="padding-bottom: 10px;">{{ pdf_label_sub('&#160;') }}</div>
@@ -83,7 +83,7 @@ snippet twig_linienawydruku_A4 "4 ładnie sformatoane linie na wydryku A4"
 <div style="padding-bottom: 15px;"><b>5.</b> Rozpoznanie: </div>
 {{ dane.rozpoznanie ? dane.rozpoznanie|nl2br : lines }}
 endsnippet
-snippet twig_podkreslenianawydruku "Podkreślanie wybranej opcji na wydruku."
+snippet twig_text_deletion_markup "Pick one and mark other as deleted."
 {% set opcja = dane.zgoda %}
 <div style="padding-bottom: 5px; {{ opcja ? checked }}">  
     - za zgodą / bez zgody*,
@@ -92,7 +92,7 @@ endsnippet
 
 
 # ===== ORM =====
-snippet orm_manyToMany "Przykład powiązania many to many."
+snippet orm_manyToMany "Doctrine many to many sample."
 manyToMany:
     nfzIcfOcenaHospWypis: (nazwa właściwości encji)
         targetEntity: SMS\Domain\Nfz\Zlec\Zlec (endja w którą celujemy)
@@ -106,14 +106,14 @@ manyToMany:
                     referencedColumnName: id
         cascade: [persist]
 endsnippet
-snippet orm_manyToOne "Przykład powiązania many to one."
+snippet orm_manyToOne "Doctrine many to one sample."
 manyToOne:
   tag:
     targetEntity: SMS\Bundle\Pliki\Domain\Plik\Tag
     joinColumn: { name: idtag }
     inversedBy: plikTag
 endsnippet
-snippet orm_oneToMany "Przykład powiązania one to many."
+snippet orm_oneToMany "Doctrine one to many sample."
 oneToMany:
   plikTag:
     targetEntity: SMS\Bundle\Pliki\Domain\Plik\PlikTag
@@ -122,19 +122,19 @@ endsnippet
 
 
 # ===== XML WRITER =====
-snippet xml_writer_attribute "Dodanie atrybutu do aktualnie otwartego elementu."
+snippet xml_writer_attribute "Add attribute."
 $xml->writeAttribute("", null);
 endsnippet
-snippet xml_writer_attribute_ns "Dodanie atrybutu z namespacem do aktualnie otwartego elementu."
+snippet xml_writer_attribute_ns "Add namespace attribute."
 $xml->writeAttributeNs('', '', null, 'uri');
 endsnippet
-snippet xml_writer_block "Bloczek z atrybutami biblioteki xml_writer."
+snippet xml_writer_block "Add block."
 $xml->startElement("");
     $xml->writeAttribute("", null);
     $xml->writeAttribute("", null);
 $xml->endElement(); // koniec ""
 endsnippet
-snippet xml_writer_block_ns "Dodanie bloczku z namespacami."
+snippet xml_writer_block_ns "Add namespace block."
 $xml->startElementNs('', '', null);
     $xml->writeAttributeNs('', '', null, 'uri');
     $xml->writeAttributeNs('', '', null, 'uri');
@@ -143,7 +143,7 @@ endsnippet
 
 
 # ===== SYMFONY =====
-snippet symf_cookies "Dodanie zapamiętywania wybranych danych formularza w cookies."
+snippet symf_cookies "Remember form data in cookies from controller."
 // kod poniżej wstawć na samym początku metody
 $cookie         = new SmsCookie();
 $formData       = [];
@@ -171,7 +171,7 @@ $formCookieData['dokPoradniaDo'] = $data['dokPoradniaDo'];
 
 $cookie->set('pacj_archiwum', serialize($formCookieData));
 endsnippet
-snippet symf_wyslij_mail "Wysyłanie maili z poziomu controllera."
+snippet symf_wyslij_mail "Send mails from controller."
 $body  = 'id:'.$kodKsiegowy->getId().'<br>';
 $body .= 'przedKod:'.$kodPrzed.'<br>';
 $body .= 'poKod:'.$kodKsiegowy->getKod().'<br>';
