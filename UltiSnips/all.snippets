@@ -1,205 +1,105 @@
 # ===== SQL =====
 snippet sql_add_column "Add column to table."
--- If you add to xlogged table remember to reset id in xlog table.
-ALTER TABLE table
-ADD COLUMN column data_type;
+ALTER TABLE ${1:table}
+ADD COLUMN ${2:column} ${3:data_type};
 endsnippet
+
 snippet sql_add_foreign_key "Add foreign key to database table."
-ALTER TABLE table ADD COLUMN idcolumn INT REFERENCES table2(id);
+ALTER TABLE ${1:table} ADD COLUMN ${2:idcolumn} INT REFERENCES ${3:table2}(id);
 endsnippet
+
 snippet sql_changetype "Change column type in a table."
-ALTER TABLE table
-ALTER COLUMN column TYPE data_type;
+ALTER TABLE ${1:table}
+ALTER COLUMN ${2:column} TYPE ${3:data_type};
 endsnippet
+
 snippet sql_default "Change or remove default value from column."
-ALTER TABLE table ALTER COLUMN column [SET DEFAULT default_value | DROP DEFAULT];
+ALTER TABLE ${1:table} ALTER COLUMN ${2:column} ${3:SET DEFAULT default_value} ${4:DROP DEFAULT};
 endsnippet
+
 snippet sql_dropcolumn "Drop column from table."
-ALTER TABLE table
-DROP COLUMN column;
+ALTER TABLE ${1:table}
+DROP COLUMN ${2:column};
 endsnippet
+
 snippet sql_FDMcreatetable "Creating table for FDM with 1 relation (pacj)."
-CREATE TABLE table (
+CREATE TABLE ${1:table} (
     id SERIAL PRIMARY KEY,
-    wysw BOOLEAN DEFAULT true,
-    del BOOLEAN DEFAULT false,
-    dodata TIMESTAMP WITHOUT TIME ZONE,
-    didoper INTEGER,
-    modata TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
-    midoper INTEGER,
-    licznik INTEGER DEFAULT 0,
-    opis TEXT,
-    komentarz CHARACTER VARYING(100),
-    idpacj INTEGER,
-    data_badania DATE,
-    pozwolenie TEXT,
-    uwagi_zalecenia TEXT,
-    skier_na_kons_adres TEXT,
-    data_wyst DATE DEFAULT now(),
-    nr_dok_tozsamosci TEXT,
-    godzina TEXT,
-    miejscowosc TEXT,
-    szczepienie_przeciw TEXT,
+    bool BOOLEAN DEFAULT true,
+    date TIMESTAMP WITHOUT TIME ZONE,
+    integer INTEGER,
+    def_now TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
+    varchar CHARACTER VARYING(100),
+    text TEXT,
 
-    FOREIGN KEY (didoper) REFERENCES public.oper (id),
-    FOREIGN KEY (idpacj) REFERENCES public.pacj (id),
-    FOREIGN KEY (midoper) REFERENCES public.oper (id)
+    FOREIGN KEY (key_in_this_table) REFERENCES public.some_other_table (key_in_some_other_table),
 );
-
-INSERT INTO fdm (dodata, didoper, modata, midoper, opis, kod, kod2, nazw, kategoria, rum)
-VALUES ('now()', 0,
 endsnippet
+
 snippet sql_insertinto "Insert into."
-INSERT INTO table (dodata, didoper, modata, midoper, opis, add1, add2, add3, add4)
-VALUES ('now()', 0, 'now()', 0, opis, add1, add2, add3, add4);
+INSERT INTO table (${1:column_1}, ${2:column_2})
+VALUES (${3:data_1}, ${4:data_2});
 endsnippet
+
 snippet sql_update "Update."
-UPDATE table
-SET column = value, column2 = value2
-WHERE condition;
-endsnippet
-snippet sql_xlogid "Move idxlog column to the end of a table."
-ALTER TABLE xlog_pacj
-DROP COLUMN idxlog;
-
-ALTER TABLE xlog_pacj
-ADD COLUMN idxlog SERIAL PRIMARY KEY;
-endsnippet
-
-
-# ===== TWIG =====
-snippet twig_print_line_and_label "Single dotted line with braced label under it."
-<div style="padding-bottom: 10px;"><b>4.</b> Przedstawiciel ustawowy, jeżeli dotyczy: </div>
-{{ pdf_label(dane.przedstawicielUstawowy|nl2br) }} {{ pdf_label_sub('', '(imię, nazwisko, adres)') }}
-endsnippet
-snippet twig_multiple_lines_A4 "4 pretty formatted lines for A4 paper size."
-{% set lines %}
-    <div style="padding-bottom: 10px; padding-top: 15px;">{{ pdf_label_sub('&#160;') }}</div>
-    <div style="padding-bottom: 10px;">{{ pdf_label_sub('&#160;') }}</div>
-    <div style="padding-bottom: 10px;">{{ pdf_label_sub('&#160;') }}</div>
-    <div style="padding-bottom: 15px;">{{ pdf_label_sub('&#160;') }}</div>
-{% endset %}
-
-<div style="padding-bottom: 15px;"><b>5.</b> Rozpoznanie: </div>
-{{ dane.rozpoznanie ? dane.rozpoznanie|nl2br : lines }}
-endsnippet
-snippet twig_text_deletion_markup "Pick one and mark other as deleted."
-{% set opcja = dane.zgoda %}
-<div style="padding-bottom: 5px; {{ opcja ? checked }}">  
-    - za zgodą / bez zgody*,
-</div>
+UPDATE ${1:table}
+SET ${2:column_1} = ${3:value_1}, ${4:column_2} = ${5:value2}
+WHERE ${6:condition};
 endsnippet
 
 
 # ===== ORM =====
-snippet orm_manyToMany "Doctrine many to many sample."
+snippet yml_orm_manyToMany "Doctrine many to many sample."
 manyToMany:
-    nfzIcfOcenaHospWypis: (nazwa właściwości encji)
-        targetEntity: SMS\Domain\Nfz\Zlec\Zlec (endja w którą celujemy)
+    ${1:entityName}
+    targetEntity: ${2:xxx/xxx}
         joinTable:
-            name: zlec_icf_kod_ocena (tabela łącząca)
-            joinColumns:
-                idnfz_icf_ocena_hosp_wypis: (kolumna z id aktualnej tabeli)
-                    referencedColumnName: id
+            name: ${3:connecting_table}
+	    joinColumns:
+                ${4:current_foreign_key}:
+                    referencedColumnName: ${5:referenced_key}
             inverseJoinColumns:
-                idzlec: (kolumna z id tabeli w którą celujemy)
-                    referencedColumnName: id
+                ${6:target_foreign_key}:
+                    referencedColumnName: ${7:target_key}
         cascade: [persist]
 endsnippet
-snippet orm_manyToOne "Doctrine many to one sample."
+
+snippet yml_orm_manyToOne "Doctrine many to one sample."
 manyToOne:
-  tag:
-    targetEntity: SMS\Bundle\Pliki\Domain\Plik\Tag
-    joinColumn: { name: idtag }
-    inversedBy: plikTag
+  ${1:connection_name}:
+    targetEntity: ${2:xxx/xxx}
+    joinColumn: { name: ${3:foreign_key} }
+    inversedBy: ${4:inversed_connection_name}
 endsnippet
-snippet orm_oneToMany "Doctrine one to many sample."
+
+snippet yml_orm_oneToMany "Doctrine one to many sample."
 oneToMany:
-  plikTag:
-    targetEntity: SMS\Bundle\Pliki\Domain\Plik\PlikTag
-    mappedBy: tag
+  ${1:connection_name}:
+    targetEntity: ${2:xxx/xxx}
+    mappedBy: ${3:inversed_connection_name}
 endsnippet
 
 
 # ===== XML WRITER =====
 snippet xml_writer_attribute "Add attribute."
-$xml->writeAttribute("", null);
+$xml->writeAttribute(${1:attribute_name}, ${2:attribute_value});
 endsnippet
+
 snippet xml_writer_attribute_ns "Add namespace attribute."
-$xml->writeAttributeNs('', '', null, 'uri');
+$xml->writeAttributeNs(${1:attribute_name}, ${2:attribute_value}, ${3:namespace}, ${4:uri});
 endsnippet
+
 snippet xml_writer_block "Add block."
-$xml->startElement("");
-    $xml->writeAttribute("", null);
-    $xml->writeAttribute("", null);
-$xml->endElement(); // koniec ""
+$xml->startElement(${1:element_name});
+    $xml->writeAttribute(${2:attribute_name}, ${3:attribute_value});
+    $xml->writeAttribute(${4:attribute_name}, ${5:attribute_value});
+$xml->endElement(); // end of ${1:element_name}
 endsnippet
+
 snippet xml_writer_block_ns "Add namespace block."
-$xml->startElementNs('', '', null);
-    $xml->writeAttributeNs('', '', null, 'uri');
-    $xml->writeAttributeNs('', '', null, 'uri');
-$xml->endElement();
-endsnippet
-
-
-# ===== SYMFONY =====
-snippet symf_cookies "Remember form data in cookies from controller."
-// kod poniżej wstawć na samym początku metody
-$cookie         = new SmsCookie();
-$formData       = [];
-
-if ($cookie->has('pacj_archiwum')) {
-    $formData = unserialize($cookie->get('pacj_archiwum'));
-
-    $poradnia = $this->poradniaManager->getPoradniaById($formData['poradnia']);
-    $formData['poradnia'] = $poradnia;
-}
-
-$form = $this->createForm('pacj_archiwum', $pacjDoArchiwum, [
-    'data' => $formData,
-]);
-
-// kod poniżej wstawić do $form->isSubmitted / $form->isValid
-$data = $form->getData();
-$formCookieData = [];
-/** @var Poradnia $poradnia */
-$poradnia = $data['poradnia'];
-
-$formCookieData['poradnia'] = $poradnia->getId();
-$formCookieData['dokPoradniaOd'] = $data['dokPoradniaOd'];
-$formCookieData['dokPoradniaDo'] = $data['dokPoradniaDo'];
-
-$cookie->set('pacj_archiwum', serialize($formCookieData));
-endsnippet
-snippet symf_wyslij_mail "Send mails from controller."
-$body  = 'id:'.$kodKsiegowy->getId().'<br>';
-$body .= 'przedKod:'.$kodPrzed.'<br>';
-$body .= 'poKod:'.$kodKsiegowy->getKod().'<br>';
-$body .= 'przedMoper:'.$moperPrzed.'<br>';
-$body .= 'poMoper:'.$kodKsiegowy->getMoper().'<br>';
-$body .= 'przedModata:'.$modataPrzed.'<br>';
-$body .= 'poModata:'.$kodKsiegowy->getModata()->format('Y-m-d H:i:s').'<br>';
-$message = \Swift_Message::newInstance()
-    ->setSubject('mapowanie_kont_ksiegowych_log')
-    ->setFrom('SMS@blue-note.pl')
-    ->setTo('pkochany@blue-note.pl')
-    ->setBody(
-	$body,
-	'text/html'
-    );
-$this->getContainer()->get('mailer')->send($message);
-endsnippet
-snippet symf_select2 "Prepare data for Select2 response in Controller."
-$lokalizacje = $this->lokalizacjaRepository->getLokalizacje();
-$gotowaLokArray = [];
-
-// przygotowanie odpowiedzi pod select2
-foreach ($lokalizacje as $arr) {
-    $arr['text'] = $arr['nazwa'];
-    array_push($gotowaLokArray, $arr);
-}
-
-return new JsonResponse($gotowaLokArray);
+$xml->startElementNs(${1:attribute_name}, ${2:attribute_value}, ${3:namespace});
+    $xml->writeAttributeNs(${4:attribute_name}, ${5:attribute_value}, ${6:namespace}, ${7:uri});
+$xml->endElement(); // end of ${1:attribute_name}
 endsnippet
 
 
@@ -209,31 +109,21 @@ $(document).ready(function() {
 
 });
 endsnippet
+
 snippet jq_ajax_call "jQuery Ajax call function"
 $('.edytuj').click(function(e){
-    e.preventDefault();
-
-    var $lp = $(this).attr('id');
-
-    var $kod = $('#kod-' + $lp).text();
-    var $kodid = $('#kodid-' + $lp).text();
-    var $idlokalizacja = $('#lokalizacja-' + $lp).text();
-    var $idmp_poradnia = $('#poradnia-' + $lp).text();
-    var $modal = $('#edytuj-modal');
+    var ${1:$variable_1} = ;
+    var ${2:$variable_2} = ; 
 
     $.ajax({
-        url: Routing.generate('faktura.optima.mapowanie.edytuj'),
-        method: "POST",
+        url: ${3:url},
+        method: ${4:"POST"},
         data: {
-            kod: $kod,
-            kodid: $kodid,
-            idlokalizacja: $idlokalizacja,
-            idmp_poradnia: $idmp_poradnia
+            ${5:req_data_1}: ${1:$variable_1},
+            ${6:req_data_2}: ${2:$variable_2}
         },
         success: function (html) {
-            $modal.html(html);
-            $('.modal-content').css('maxWidth', 1000).addClass('col-sm-6').css({'top': '10%'}).css({'left': '25%'});
-            $modal.modal();
+            ${7:target_element}.html(html);
         }
     });
 });
