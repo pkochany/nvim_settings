@@ -1,12 +1,3 @@
-I have finally reached a point in my life where I can just sit back, relax, make a cup of coffey
-and do what I always wanted to do but never had the time.
-
-One of the things I wanted to do for some time now was to transform neovim into a full grown IDE.
-I remember when I used Linux terminal for the first time in my life and just fell in love right there.
-Having the ability to do literally everything with data from one place with just commands is the ultimate sophistication.
-
-But enough of that crap, I'm sure you are here for the juicy knowledge so let us begin.
-
 Writing this I am using Ubuntu 20.04 LTS. GNOME 3.36.3.
 
 Step 1:
@@ -23,8 +14,6 @@ nvim:
 :checkhealth
 
 The output for me shows that I miss python 2, python 3, ruby and node.js.
-[picture]
-
 
 Step 3:
 By the time of writing this python 2 is already outdated but I will install it anyway just to check all the boxes.
@@ -61,8 +50,7 @@ pip2 install neovim
 Now my version of Ubuntu already comes with pre-installed python 3 with pip and all the goodies.
 If yours does not please repeat step 3 and step 4 but change python2 to python3 and pip2 to pip3.
 
-After it's done when I run checkhealth I can see more green:
-[screen]
+After it's done when I run checkhealth I can see more green.
 
 
 Step 5:
