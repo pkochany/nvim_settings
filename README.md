@@ -156,6 +156,7 @@ As you can see in code above I create this tags file inside git folder so it wil
 Now lets install autocomplete dependencies for nice auto complete feature. In terminal:
 
 ```
+sudo apt install npm
 sudo apt install build-essential cmake vim python3-dev
 sudo apt install mono-complete
 sudo apt install golang-go
