@@ -140,13 +140,22 @@ let g:UltiSnipsRemoveSelectModeMappings = 0
 " Key mappings
 map <C-p> :NERDTreeToggle<CR>
 map <C-u> :NERDTreeFocus<CR>
-map <C-f> :Files<CR>
 map <C-d> :bdelete<CR>
 map <C-t> :TagbarToggle<CR>
 " with ctrl + B toggle buffer explorer
-map <C-b> :ToggleBufExplorer<CR>
+map 1 :ToggleBufExplorer<CR>
+map 2 :Files<CR>
 map <C-q> :q!<CR>
 map <C-s> :w<CR>
+map a <Left>
+map s <Down>
+map w <Up>
+map d <Right>
+map q <C-b>
+map e <C-f>
+nnoremap c A
+nnoremap z I
+nnoremap x M
 " make YCM compatible with UltiSnips (using supertab)
 let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
 let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
@@ -190,4 +199,14 @@ augroup project1
     autocmd BufRead */* DBSetOption profile=test
 augroup end
 
+" " Copy to clipboard
+vnoremap  <leader>y  "+y
+nnoremap  <leader>Y  "+yg_
+nnoremap  <leader>y  "+y
+nnoremap  <leader>yy  "+yy
 
+" " Paste from clipboard
+nnoremap <leader>p "+p
+nnoremap <leader>P "+P
+vnoremap <leader>p "+p
+vnoremap <leader>P "+P
