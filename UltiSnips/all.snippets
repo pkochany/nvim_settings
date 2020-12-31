@@ -1,3 +1,71 @@
+# ===== Django = Python =====
+snippet model_class "Class in models.py"
+class ${1:Class_name}(models.Model):
+endsnippet
+
+snippet django_model_foreign_key_field "Foreign key in models.py"
+${1:field_name} = models.ForeignKey(${2:Target_class}, on_delete=models.CASCADE)
+endsnippet
+
+snippet django_model_integer_field "Integer in models.py"
+${1:field_name} = models.IntegerField(default=${2:default})
+endsnippet
+
+snippet django_model_datetime_field "Datetime in models.py"
+${1:field_name} = models.DateTimeField()
+endsnippet
+
+snippet django_model_char_field "Char in models.py"
+${1:field_name} = models.CharField(max_length=${2:max_length})
+endsnippet
+
+snippet django_float_char_field "Float in models.py"
+${1:field_name} = models.FloatField()
+endsnippet
+
+snippet django_model_bool_field "Bool in models.py"
+${1:field_name} = models.BooleanField(default=${2:default})
+endsnippet
+
+snippet django_model_file_field "File in models.py"
+# remember to create storage.py file with properly adjusted storage.py snippet
+${1:field_name} = models.FileField(upload_to='${2:labels/erection/}', storage=OverwriteStorage())
+endsnippet
+
+snippet django_storage_overwrite "Default storage.py overwrite class"
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
+import os
+from django.db import connection
+
+class OverwriteStorage(FileSystemStorage):
+    def get_available_name(self, name, max_length=None):
+	# If the filename already exists, remove it as if it was a true file system
+	if self.exists(name):
+	    os.remove(os.path.join(settings.MEDIA_ROOT, name))
+	    name_db = str(name)
+	    name_db = name_db.replace("\\", "/")
+	    cursor = connection.cursor()
+	    cursor.execute("DELETE FROM kerp_bom_drawing WHERE docfile LIKE '%" + name_db + "%'")
+	return name
+endsnippet
+
+snippet django_model_add_profile_to_user "Add additional information assigned to each user"
+# Additional user data hooked to User
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    # prod_line = models.ForeignKey(Prod_line, on_delete=models.CASCADE, null=True, default=None, blank=True)
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.profile.save()
+endsnippet
+
 # ===== SQL =====
 snippet sql_add_column "Add column to table."
 ALTER TABLE ${1:table}
